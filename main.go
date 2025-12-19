@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"time"
 
+	"github.com/ClickHouse/clickhouse-go/v2"
 	connect_go "github.com/bufbuild/connect-go"
-	_ "github.com/duckdb/duckdb-go/v2"
+	"github.com/kelseyhightower/envconfig"
 	apiv1 "github.com/ruhika006/funding-analytics/gen/api/v1"
 	apiv1connect "github.com/ruhika006/funding-analytics/gen/api/v1/apiv1connect"
 	"github.com/ruhika006/funding-analytics/handlers"
@@ -59,31 +60,69 @@ func (cs *ConnectServer) GetTopCityAndIndustries(ctx context.Context, req *conne
 	return connect_go.NewResponse(resp), nil
 }
 
+type Specification struct {
+	User string
+	Password string
+	Addr string
+}
+
 func main() {
-	db, err := sql.Open("duckdb", "")
-	if err != nil {
-		log.Fatal(err)
+	// Get configuration from environment
+	var spec Specification
+	if err := envconfig.Process("myapp", &spec); err != nil {
+		log.Fatalf("Failed to load configuration: %v", err)
 	}
-	defer db.Close()
 
-	fmt.Println("Opened up DuckDB")
-
-	_, err = db.Exec(`
-		CREATE TABLE startup AS
-		SELECT * FROM read_csv('./app/startup_funding.csv')
-	`)
+	// Initialize ClickHouse connection
+	chClient, err := initClickHouseClient(spec)
 	if err != nil {
-		log.Fatal("Unable to load into table", err)
+		log.Fatalf("Failed to initialize ClickHouse client: %v", err)
 	}
+	defer chClient.Close()
+
+	// Verify ClickHouse connectivity
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	if err := chClient.Ping(ctx); err != nil {
+		cancel()
+		log.Fatalf("ClickHouse ping failed: %v", err)
+	}
+	cancel()
+
+	log.Println("Connected to ClickHouse")
 
 	mux := http.NewServeMux()
 
-	// Create server with DuckDB client
-	server := handlers.NewServer(db)
+	// Create server with ClickHouse client
+	server := handlers.NewServer(chClient)
 	connectServer := &ConnectServer{server: server}
 	path, handler := apiv1connect.NewQueryServiceHandler(connectServer)
 	mux.Handle(path, handler)
 
-	log.Println("Server listening on :8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	addr := ":" + port
+	log.Printf("Server listening on %s", addr)
+	log.Fatal(http.ListenAndServe(addr, mux))
+}
+
+
+// initClickHouseClient initializes a ClickHouse connection
+func initClickHouseClient(spec Specification) (clickhouse.Conn, error) {
+	conn, err := clickhouse.Open(&clickhouse.Options{
+		Addr: []string{spec.Addr},
+		Auth: clickhouse.Auth{
+			Username: spec.User,
+			Password: spec.Password,
+		},
+		Settings: clickhouse.Settings{
+			"max_execution_time": 60,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
 }
