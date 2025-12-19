@@ -15,6 +15,8 @@ provider "aws" {
 
 # For ECS
 
+/* Uncomment below code block to use ECS Fargate
+
 data "aws_vpc" "default" {
   default = true
 }
@@ -129,7 +131,7 @@ resource "aws_instance" "ruh-ubuntu-ec2"{
 }
 */
 
-/* Uncommnet below code block to use AppRunner
+
 
 provider "aws" {
   region  = "ap-south-1"
@@ -182,4 +184,3 @@ resource "aws_apprunner_service" "db_apprunner" {
   }
 }
 
-*/
