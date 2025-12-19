@@ -1,6 +1,8 @@
 # Startup Funding Database API
 
-A gRPC/Connect-RPC API server for querying startup funding data stored in DuckDB.
+A gRPC/Connect-RPC API server for querying startup funding data stored in DuckDB and ClickHouse.
+
+**Note: master branch has DuckDB implemenation; where ch-implementation branch has ClickHouse Implementation.**
 
 ## Overview
 
@@ -81,10 +83,11 @@ curl -X POST http://localhost:8080/api.v1.QueryService/GetTopCityAndIndustries \
 
 ### Note : With AppRunner :
 
+```bash
 curl -X POST <DEFAULT_DOMAIN>/api.v1.QueryService/GetRecords \
   -H "Content-Type: application/json" \
   -d '{"limit": 10}' | jq
-
+```
 
 ## Data Schema
 
@@ -95,6 +98,17 @@ The startup table contains the following columns (loaded from CSV):
 - `Investor` (String)
 - `Year` (Int64)
 - `City` (String)
+
+## Deployment
+AWS Deployment with Terraform
+
+To deploy to AWS, infrastructure-as-code blocks are available in main.tf. The application is by default deployed to AWS App Runner.
+
+```bash
+terraform apply
+```
+
+This will provision the necessary AWS resources for the application including compute, networking, and database connectivity.
 
 ## Architecture Notes
 
