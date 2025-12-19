@@ -2,37 +2,39 @@ package handlers
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
+
+	"github.com/ClickHouse/clickhouse-go/v2"
+	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 )
 
 // Server implements QueryService
 type Server struct {
-	DBClient *sql.DB
+	client clickhouse.Conn
 }
 
 // NewServer creates a new query handler server
-func NewServer(dbClient *sql.DB) *Server {
+func NewServer(client clickhouse.Conn) *Server {
 	return &Server{
-		DBClient: dbClient,
+		client: client,
 	}
 }
 
 // ExecuteQuery runs a SQL query and handles common error logging
-func (s *Server) ExecuteQuery(ctx context.Context, query string) (*sql.Rows, error) {
-	rows, err := s.DBClient.Query(query)
+func (s *Server) ExecuteQuery(ctx context.Context, query string) (driver.Rows, error) {
+	rows, err := s.client.Query(ctx, query)
 	if err != nil {
-		log.Printf("DuckDB query error: %v\nQuery: %s", err, query)
+		log.Printf("ClickHouse query error: %v\nQuery: %s", err, query)
 		return nil, fmt.Errorf("query execution failed: %w", err)
 	}
 	return rows, nil
 }
 
 // CheckRowsError checks for errors after row iteration completes
-func (s *Server) CheckRowsError(rows *sql.Rows) error {
+func (s *Server) CheckRowsError(rows driver.Rows) error {
 	if err := rows.Err(); err != nil {
-		log.Printf("DuckDB rows iteration error: %v", err)
+		log.Printf("ClickHouse rows iteration error: %v", err)
 		return fmt.Errorf("rows iteration failed: %w", err)
 	}
 	return nil
@@ -40,6 +42,6 @@ func (s *Server) CheckRowsError(rows *sql.Rows) error {
 
 // ScanError logs scan errors with context
 func (s *Server) ScanError(err error, context string) error {
-	log.Printf("DuckDB scan error in %s: %v", context, err)
+	log.Printf("ClickHouse scan error in %s: %v", context, err)
 	return fmt.Errorf("failed to scan row in %s: %w", context, err)
 }
