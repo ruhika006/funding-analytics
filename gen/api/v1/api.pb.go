@@ -7,13 +7,12 @@
 package apiv1
 
 import (
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
-
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
 )
 
 const (
@@ -810,9 +809,9 @@ const file_api_v1_api_proto_rawDesc = "" +
 	"\x10GetTopIndustries\x12\x1f.api.v1.GetTopIndustriesRequest\x1a .api.v1.GetTopIndustriesResponse\x12g\n" +
 	"\x16GetTopIndustriesByYear\x12%.api.v1.GetTopIndustriesByYearRequest\x1a&.api.v1.GetTopIndustriesByYearResponse\x12a\n" +
 	"\x14GetTopFundedStartups\x12#.api.v1.GetTopFundedStartupsRequest\x1a$.api.v1.GetTopFundedStartupsResponse\x12j\n" +
-	"\x17GetTopCityAndIndustries\x12&.api.v1.GetTopCityAndIndustriesRequest\x1a'.api.v1.GetTopCityAndIndustriesResponseB\x87\x01\n" +
+	"\x17GetTopCityAndIndustries\x12&.api.v1.GetTopCityAndIndustriesRequest\x1a'.api.v1.GetTopCityAndIndustriesResponseB\x88\x01\n" +
 	"\n" +
-	"com.api.v1B\bApiProtoP\x01Z6github.com/ruhika006/funding-analytics/gen/api/v1;apiv1\xa2\x02\x03AXX\xaa\x02\x06Api.V1\xca\x02\x06Api\\V1\xe2\x02\x12Api\\V1\\GPBMetadata\xea\x02\aApi::V1b\x06proto3"
+	"com.api.v1B\bApiProtoP\x01Z7github.com/ruhika006/funding-analytics/gen/api/v1;apiv1\xa2\x02\x03AXX\xaa\x02\x06Api.V1\xca\x02\x06Api\\V1\xe2\x02\x12Api\\V1\\GPBMetadata\xea\x02\aApi::V1b\x06proto3"
 
 var (
 	file_api_v1_api_proto_rawDescOnce sync.Once

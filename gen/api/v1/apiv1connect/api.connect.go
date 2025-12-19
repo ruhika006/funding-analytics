@@ -7,11 +7,10 @@ package apiv1connect
 import (
 	context "context"
 	errors "errors"
-	http "net/http"
-	strings "strings"
-
 	connect_go "github.com/bufbuild/connect-go"
 	v1 "github.com/ruhika006/funding-analytics/gen/api/v1"
+	http "net/http"
+	strings "strings"
 )
 
 // This is a compile-time assertion to ensure that this generated file and the connect package are
