@@ -102,7 +102,7 @@ The startup table contains the following columns (loaded from CSV):
 ## Deployment
 AWS Deployment with Terraform
 
-To deploy to AWS, infrastructure-as-code blocks are available in main.tf. The application is by default deployed to AWS App Runner.
+To deploy to AWS, infrastructure-as-code blocks are available in main.tf. The application is by default deployed to AWS ECS
 
 ```bash
 terraform apply
