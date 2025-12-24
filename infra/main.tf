@@ -92,7 +92,7 @@ resource "aws_ecs_service" "main" {
   }
 }
 
-*/
+
 
 # EC2
 
